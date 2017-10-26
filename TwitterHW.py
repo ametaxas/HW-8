@@ -33,8 +33,10 @@ except:
 # Your function must cache data it retrieves and rely on a cache file!
 
 
-def get_tweets():
-##YOUR CODE HERE
+def get_tweets(cache_diction = CACHE_DICTION):
+    max_id = None
+    while len(api.search(q = 'umsi', rpp = 100, max_id = max_id)['statuses']) == 100:
+        for tweet in api.search(q = 'umsi', rpp = 100, max_id = max_id)
 
 
 
