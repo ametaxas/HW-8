@@ -21,11 +21,11 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 CACHE_FNAME = "twitter_cache.json"
 try:
     cache_file = open(CACHE_FNAME,'r')
-        cache_contents = cache_file.read()
-        cache_file.close()
-        CACHE_DICTION = json.loads(cache_contents)
+    cache_contents = cache_file.read()
+    cache_file.close()
+    cache_diction = json.loads(cache_contents)
 except:
-    CACHE_DICTION = {}
+    cache_diction = {}
 
 ## [PART 1]
 
@@ -33,11 +33,22 @@ except:
 # Your function must cache data it retrieves and rely on a cache file!
 
 
-def get_tweets(cache_diction = CACHE_DICTION):
+def get_tweets(cache_diction = cache_diction):
     max_id = None
-    while len(api.search(q = 'umsi', rpp = 100, max_id = max_id)['statuses']) == 100:
-        for tweet in api.search(q = 'umsi', rpp = 100, max_id = max_id)
+    x = api.search(q = 'umsi', rpp = 100, max_id = max_id)['statuses']
+    while len(x) == 100:
+        for tweet in x:
+            cache_diction[tweet['id']] = tweet
+            max_id = tweet['id'] - 1
+        x = api.search(q = 'umsi', rpp = 100, max_id = max_id)
+    for tweet in x:
+        cache_diction[tweet['id']] = tweet
+    cache_file = open(CACHE_FNAME, 'w')
+    cache_file.write(json.dumps(cache_diction, indent = 4))
+    cache_file.close()
 
+get_tweets()
+print (len(cache_diction))
 
 
 ## [PART 2]
