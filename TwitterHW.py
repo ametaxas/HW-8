@@ -31,26 +31,33 @@ except:
 
 # Here, define a function called get_tweets that searches for all tweets referring to or by "umsi"
 # Your function must cache data it retrieves and rely on a cache file!
-
-
 def get_tweets(cache_diction = cache_diction):
     max_id = None
-    x = api.search(q = 'umsi', rpp = 100, max_id = max_id)['statuses']
-    while len(x) == 100:
-        for tweet in x:
-            cache_diction[tweet['id']] = tweet
-            max_id = tweet['id'] - 1
-        x = api.search(q = 'umsi', rpp = 100, max_id = max_id)
-    for tweet in x:
-        cache_diction[tweet['id']] = tweet
+    while True:
+        y = api.user_timeline(screen_name = 'umsi', max_id = max_id)
+        for tweet in y:
+            if tweet['id'] not in cache_diction:
+                cache_diction[tweet['id']] = tweet
+                max_id = tweet['id'] - 1
+        print (max_id)
+        if max_id > 643470021797249024:
+            continue
+        else:
+            break
+    # max_id = None
+    # while True:
+    #     x = api.search(q = 'umsi', rpp = 100, max_id = max_id)['statuses']
+    #     for tweet in x:
+    #         if tweet['id'] not in cache_diction:
+    #             cache_diction[tweet['id']] = tweet
+    #             max_id = tweet['id'] - 1
+    #             print (max_id)
     cache_file = open(CACHE_FNAME, 'w')
     cache_file.write(json.dumps(cache_diction, indent = 4))
     cache_file.close()
 
 get_tweets()
 print (len(cache_diction))
-
-
 ## [PART 2]
 # Create a database: tweets.sqlite,
 # And then load all of those tweets you got from Twitter into a database table called Tweets, with the following columns in each row:
@@ -63,11 +70,12 @@ print (len(cache_diction))
 # Below we have provided interim outline suggestions for what to do, sequentially, in comments.
 
 # 1 - Make a connection to a new database tweets.sqlite, and create a variable to hold the database cursor.
-
-
-# 2 - Write code to drop the Tweets table if it exists, and create the table (so you can run the program over and over), with the correct (4) column names and appropriate types for each.
-# HINT: Remember that the time_posted column should be the TIMESTAMP data type!
-
+# conn = sqlite3.connect('tweets.sqlite')
+# cur = conn.cur
+# # 2 - Write code to drop the Tweets table if it exists, and create the table (so you can run the program over and over), with the correct (4) column names and appropriate types for each.
+# # HINT: Remember that the time_posted column should be the TIMESTAMP data type!
+# cur.execute('DROP TABLE IF EXISTS Tweets')
+# cur.execute('CREATE TABLE Tweets (tweet_id INTEGER, author TEXT, time_posted TEXT, tweet_text TEXT, retweets INTEGER')
 # 3 - Invoke the function you defined above to get a list that represents a bunch of tweets from the UMSI timeline. Save those tweets in a variable called umsi_tweets.
 
 
